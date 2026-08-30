@@ -39,8 +39,8 @@ export async function generateMetadata({
   const hasQuery = Object.values(params).some((value) => first(value));
 
   return pageMetadata({
-    title: `All ${directory.listing.pluralLower}`,
-    description: `Browse every ${directory.listing.singularLower} in ${directory.siteName}.`,
+    title: `Alle ${directory.listing.pluralLower}`,
+    description: `Elke ${directory.listing.singularLower} in ${directory.siteName}, met standplaats en werkgebied.`,
     // The canonical is always the unfiltered index: `canonical()` drops the
     // query string, so every filter combination points back here.
     path: "/directory",
@@ -88,7 +88,7 @@ export default async function DirectoryPage({
         {result.total === 1
           ? directory.listing.singularLower
           : directory.listing.pluralLower}
-        {q ? ` matching “${q}”` : ""}
+        {q ? ` voor “${q}”` : ""}
       </p>
 
       <div className="mt-6">

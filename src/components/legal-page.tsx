@@ -46,11 +46,11 @@ export function LegalPage({
       ) : (
         <div className="mt-6 rounded-lg border border-amber-300 bg-amber-50 p-4">
           <p className="font-medium text-amber-900">
-            This document has not been published yet.
+            Deze tekst is nog niet gepubliceerd.
           </p>
           <p className="mt-2 text-sm text-amber-900">
-            {intro} Until it is written, this page is not indexed by search
-            engines and is not listed in the sitemap. Add the text to{" "}
+            {intro} Zolang die er niet is, blijft deze pagina buiten de
+            zoekmachines en buiten de sitemap. Zet de tekst in{" "}
             <code className="rounded bg-amber-100 px-1">
               legal.{title.toLowerCase().includes("privacy") ? "privacy" : "terms"}
             </code>{" "}
@@ -60,11 +60,11 @@ export function LegalPage({
       )}
 
       <section className="mt-10 border-t border-[var(--color-line)] pt-6">
-        <h2 className="text-lg font-semibold">Publisher</h2>
+        <h2 className="text-lg font-semibold">Uitgever</h2>
         <address className="mt-3 space-y-1 text-[var(--color-ink-muted)] not-italic">
           <div>{company.name}</div>
           <div>{company.registeredOffice}</div>
-          <div>VAT {company.vat}</div>
+          <div>BTW {company.vat}</div>
           <div>
             <a
               href={`mailto:${directory.contactEmail}`}

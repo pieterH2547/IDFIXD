@@ -136,7 +136,7 @@ export function SubmissionForm({
         disabled={pending}
         className="rounded-md bg-[var(--color-accent)] px-4 py-2.5 text-sm font-medium text-white hover:bg-[var(--color-accent-hover)] disabled:opacity-60"
       >
-        {pending ? "Sending…" : submitLabel}
+        {pending ? "Versturen…" : submitLabel}
       </button>
     </form>
   );

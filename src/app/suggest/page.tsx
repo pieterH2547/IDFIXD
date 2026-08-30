@@ -14,8 +14,8 @@ import { Breadcrumbs } from "@/components/breadcrumbs";
  */
 
 export const metadata: Metadata = pageMetadata({
-  title: `Suggest a ${directory.listing.singularLower}`,
-  description: `Tell us about a ${directory.listing.singularLower} missing from ${directory.siteName}.`,
+  title: "Bedrijf aanmelden",
+  description: `Ontbreekt er een ${directory.listing.singularLower} in ${directory.siteName}? Meld het bedrijf hier aan.`,
   path: "/suggest",
   decision: { index: true, reason: "public submission page" },
 });
@@ -28,34 +28,35 @@ export default function SuggestPage() {
       <Breadcrumbs
         crumbs={[
           { name: "Home", path: "/" },
-          { name: "Suggest", path: "/suggest" },
+          { name: "Bedrijf aanmelden", path: "/suggest" },
         ]}
       />
 
       <h1 className="mt-4 text-2xl font-semibold tracking-tight">
-        Suggest a {directory.listing.singularLower}
+        Bedrijf aanmelden
       </h1>
       <p className="mt-2 max-w-xl text-[var(--color-ink-muted)]">
-        Missing something? Send it over. We check every suggestion against
-        public sources before it appears.
+        Ontbreekt er een boomverzorger, of klopt er iets niet? Stuur het door.
+        Elke aanmelding wordt tegen openbare bronnen gecontroleerd voordat ze
+        verschijnt.
       </p>
 
       <div className="mt-8">
         <SubmissionForm
           action={submitSuggestion}
-          submitLabel="Send suggestion"
+          submitLabel="Aanmelding versturen"
           fields={[
             {
               name: "organisation",
-              label: `${directory.listing.singular} name`,
+              label: "Naam van het bedrijf",
               required: true,
             },
             { name: "websiteUrl", label: "Website", type: "url" },
-            { name: "name", label: "Your name", required: true },
-            { name: "email", label: "Email", type: "email", required: true },
+            { name: "name", label: "Uw naam", required: true },
+            { name: "email", label: "E-mailadres", type: "email", required: true },
             {
               name: "message",
-              label: "Anything we should know?",
+              label: "Iets dat we moeten weten?",
               type: "textarea",
             },
           ]}

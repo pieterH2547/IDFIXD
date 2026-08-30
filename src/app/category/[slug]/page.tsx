@@ -50,7 +50,7 @@ export async function generateMetadata({
   const category = await getCategoryBySlug(slug);
 
   if (!category || !category.published) {
-    return { title: "Not found", robots: { index: false, follow: false } };
+    return { title: "Niet gevonden", robots: { index: false, follow: false } };
   }
 
   return pageMetadata({
@@ -90,7 +90,7 @@ export default async function CategoryPage({
       <Breadcrumbs
         crumbs={[
           { name: "Home", path: "/" },
-          { name: "Categories", path: "/categories" },
+          { name: "Categorieën", path: "/categories" },
           { name: category.name, path: `/category/${category.slug}` },
         ]}
       />

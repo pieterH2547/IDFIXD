@@ -32,7 +32,7 @@ export function SiteHeader() {
         </Link>
 
         <nav
-          aria-label="Main"
+          aria-label="Hoofdnavigatie"
           className="flex items-center gap-5 text-sm text-[var(--color-ink-muted)]"
         >
           {directory.nav.map((item) => (
@@ -76,7 +76,7 @@ export function SiteFooter() {
             © {new Date().getFullYear()} {directory.siteName}
           </p>
 
-          <nav aria-label="Footer" className="flex flex-wrap gap-x-5 gap-y-2">
+          <nav aria-label="Voettekst" className="flex flex-wrap gap-x-5 gap-y-2">
             {directory.footerNav
               .filter(
                 (item) =>
@@ -92,7 +92,7 @@ export function SiteFooter() {
                 </Link>
               ))}
             <Link href="/terms" className="hover:text-[var(--color-ink)]">
-              Terms
+              Voorwaarden
             </Link>
             <Link href="/privacy" className="hover:text-[var(--color-ink)]">
               Privacy
@@ -107,13 +107,13 @@ export function SiteFooter() {
         </div>
 
         <address className="mt-6 border-t border-[var(--color-line)] pt-4 text-xs not-italic">
-          {company.name} · {company.registeredOffice} · VAT {company.vat}
+          {company.name} · {company.registeredOffice} · BTW {company.vat}
           {legal.terms === null || legal.privacy === null ? (
             // Visible only to whoever is building the directory, and only
             // until the texts exist. A legal page that is a stub should say
             // so on the site rather than only in a config comment.
             <span className="ml-2 rounded bg-amber-100 px-1.5 py-0.5 text-amber-900">
-              Legal texts not yet published
+              Juridische teksten nog niet gepubliceerd
             </span>
           ) : null}
         </address>

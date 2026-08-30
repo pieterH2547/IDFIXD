@@ -33,7 +33,7 @@ export function Pagination({
 
   return (
     <nav
-      aria-label="Pagination"
+      aria-label="Paginering"
       className="mt-8 flex items-center justify-between border-t border-[var(--color-line)] pt-5 text-sm"
     >
       {page > 1 ? (
@@ -42,14 +42,14 @@ export function Pagination({
           href={hrefFor(page - 1)}
           className="text-[var(--color-accent)] hover:underline"
         >
-          ← Previous
+          ← Vorige
         </Link>
       ) : (
         <span />
       )}
 
       <span className="text-[var(--color-ink-muted)]">
-        Page {page} of {pageCount}
+        Pagina {page} van {pageCount}
       </span>
 
       {page < pageCount ? (
@@ -58,7 +58,7 @@ export function Pagination({
           href={hrefFor(page + 1)}
           className="text-[var(--color-accent)] hover:underline"
         >
-          Next →
+          Volgende →
         </Link>
       ) : (
         <span />

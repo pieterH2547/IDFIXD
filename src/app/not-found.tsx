@@ -11,10 +11,10 @@ import { directory } from "@/config/directory";
 export default function NotFound() {
   return (
     <div className="mx-auto max-w-2xl px-4 py-20">
-      <h1 className="text-2xl font-semibold tracking-tight">Page not found</h1>
+      <h1 className="text-2xl font-semibold tracking-tight">Pagina niet gevonden</h1>
       <p className="mt-3 text-[var(--color-ink-muted)]">
-        That page does not exist, or the {directory.listing.singularLower} it
-        pointed to is no longer published.
+        Deze pagina bestaat niet, of de {directory.listing.singularLower}
+        waar hij naar verwees staat niet meer online.
       </p>
 
       <ul className="mt-6 space-y-2 text-sm">
@@ -23,7 +23,7 @@ export default function NotFound() {
             href="/directory"
             className="text-[var(--color-accent)] hover:underline"
           >
-            Browse all {directory.listing.pluralLower}
+            Bekijk alle {directory.listing.pluralLower}
           </Link>
         </li>
         <li>
@@ -31,7 +31,7 @@ export default function NotFound() {
             href="/categories"
             className="text-[var(--color-accent)] hover:underline"
           >
-            Browse by category
+            Bekijk de categorieën
           </Link>
         </li>
       </ul>

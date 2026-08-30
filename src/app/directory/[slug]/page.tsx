@@ -44,7 +44,7 @@ export async function generateMetadata({
   const listing = await getListingBySlug(slug);
 
   if (!listing) {
-    return { title: "Not found", robots: { index: false, follow: false } };
+    return { title: "Niet gevonden", robots: { index: false, follow: false } };
   }
 
   const description =
@@ -123,7 +123,7 @@ export default async function ListingPage({ params }: { params: Params }) {
       <div className="mt-4 flex flex-wrap items-center gap-2 text-sm">
         {listing.verified ? (
           <span className="rounded bg-[var(--color-surface)] px-2 py-1 text-xs font-medium">
-            Verified
+            Geverifieerd
           </span>
         ) : null}
         {categories.map((category) => (
@@ -147,14 +147,14 @@ export default async function ListingPage({ params }: { params: Params }) {
             rel="noopener noreferrer"
             className="inline-block rounded-md bg-[var(--color-accent)] px-4 py-2.5 text-sm font-medium text-white hover:bg-[var(--color-accent-hover)]"
           >
-            Visit website
+            Naar de website
           </a>
         </p>
       ) : null}
 
       {listing.description ? (
         <section className="mt-8">
-          <h2 className="text-lg font-semibold">About</h2>
+          <h2 className="text-lg font-semibold">Over dit bedrijf</h2>
           {listing.description.split(/\n{2,}/).map((paragraph, index) => (
             <p key={index} className="mt-3 text-[var(--color-ink-muted)]">
               {paragraph}
@@ -168,10 +168,10 @@ export default async function ListingPage({ params }: { params: Params }) {
           <h2 className="text-lg font-semibold">Details</h2>
           <dl className="mt-3 divide-y divide-[var(--color-line)] border-y border-[var(--color-line)] text-sm">
             {attributes.founded ? (
-              <Row label="Founded" value={attributes.founded} />
+              <Row label="Opgericht" value={attributes.founded} />
             ) : null}
             {attributes.teamSize ? (
-              <Row label="Team size" value={attributes.teamSize} />
+              <Row label="Teamgrootte" value={attributes.teamSize} />
             ) : null}
             {werkgebied.length > 0 ? (
               <Row label="Werkgebied" value={werkgebied.join(", ")} />
@@ -202,7 +202,7 @@ export default async function ListingPage({ params }: { params: Params }) {
         <section className="mt-8 grid gap-6 sm:grid-cols-2">
           {attributes.pros?.length ? (
             <div>
-              <h2 className="text-lg font-semibold">Strengths</h2>
+              <h2 className="text-lg font-semibold">Sterke punten</h2>
               <ul className="mt-3 list-disc space-y-1.5 pl-5 text-sm text-[var(--color-ink-muted)]">
                 {attributes.pros.map((item) => (
                   <li key={item}>{item}</li>
@@ -212,7 +212,7 @@ export default async function ListingPage({ params }: { params: Params }) {
           ) : null}
           {attributes.cons?.length ? (
             <div>
-              <h2 className="text-lg font-semibold">Considerations</h2>
+              <h2 className="text-lg font-semibold">Kanttekeningen</h2>
               <ul className="mt-3 list-disc space-y-1.5 pl-5 text-sm text-[var(--color-ink-muted)]">
                 {attributes.cons.map((item) => (
                   <li key={item}>{item}</li>
@@ -225,7 +225,7 @@ export default async function ListingPage({ params }: { params: Params }) {
 
       {directory.features.pricing && listing.pricingText ? (
         <section className="mt-8">
-          <h2 className="text-lg font-semibold">Pricing</h2>
+          <h2 className="text-lg font-semibold">Prijsindicatie</h2>
           <p className="mt-2 text-[var(--color-ink-muted)]">
             {listing.pricingText}
           </p>
@@ -234,7 +234,7 @@ export default async function ListingPage({ params }: { params: Params }) {
 
       {directory.features.locations && location ? (
         <section className="mt-8">
-          <h2 className="text-lg font-semibold">Location</h2>
+          <h2 className="text-lg font-semibold">Standplaats</h2>
           <p className="mt-2 text-[var(--color-ink-muted)]">{location}</p>
         </section>
       ) : null}
@@ -257,9 +257,9 @@ export default async function ListingPage({ params }: { params: Params }) {
 
       {directory.features.sources && listing.sources.length > 0 ? (
         <section className="mt-8">
-          <h2 className="text-lg font-semibold">Sources</h2>
+          <h2 className="text-lg font-semibold">Bronnen</h2>
           <p className="mt-1 text-sm text-[var(--color-ink-muted)]">
-            Where the information on this page came from.
+            Waar de informatie op deze pagina vandaan komt.
           </p>
           <ul className="mt-3 space-y-1.5 text-sm">
             {listing.sources.map((source) => (
@@ -275,7 +275,7 @@ export default async function ListingPage({ params }: { params: Params }) {
                 {source.checkedAt ? (
                   <span className="text-[var(--color-ink-muted)]">
                     {" "}
-                    — checked {formatDate(source.checkedAt)}
+                    — gecontroleerd op {formatDate(source.checkedAt)}
                   </span>
                 ) : null}
               </li>
@@ -286,18 +286,18 @@ export default async function ListingPage({ params }: { params: Params }) {
 
       {directory.features.sources && listing.lastVerifiedAt ? (
         <p className="mt-8 text-sm text-[var(--color-ink-muted)]">
-          Last verified {formatDate(listing.lastVerifiedAt)}.
+          Laatst gecontroleerd op {formatDate(listing.lastVerifiedAt)}.
         </p>
       ) : null}
 
       {directory.features.claims ? (
         <p className="mt-3 text-sm text-[var(--color-ink-muted)]">
-          Is this your {directory.listing.singularLower}?{" "}
+          Is dit uw bedrijf?{" "}
           <Link
             href={`/claim/${listing.slug}`}
             className="text-[var(--color-accent)] hover:underline"
           >
-            Claim or correct this page
+            Claim deze pagina of corrigeer de gegevens
           </Link>
           .
         </p>
@@ -306,7 +306,7 @@ export default async function ListingPage({ params }: { params: Params }) {
       {related.length > 0 ? (
         <section className="mt-12 border-t border-[var(--color-line)] pt-6">
           <h2 className="text-lg font-semibold">
-            Related {directory.listing.pluralLower}
+            Vergelijkbare {directory.listing.pluralLower}
           </h2>
           <div className="mt-2">
             <ListingList listings={related} />

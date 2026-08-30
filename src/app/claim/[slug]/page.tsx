@@ -35,8 +35,8 @@ export async function generateMetadata({
   });
 
   return pageMetadata({
-    title: listing ? `Claim ${listing.name}` : "Claim a listing",
-    description: `Request an update to a ${directory.listing.singularLower} in ${directory.siteName}.`,
+    title: listing ? `${listing.name} claimen` : "Pagina claimen",
+    description: `Vraag een correctie aan van een ${directory.listing.singularLower} in ${directory.siteName}.`,
     path: `/claim/${slug}`,
     decision: { index: false, reason: "contact form" },
   });
@@ -65,40 +65,41 @@ export default async function ClaimPage({ params }: { params: Params }) {
           ...(listing && listing.status === "PUBLISHED"
             ? [{ name: listing.name, path: `/directory/${slug}` }]
             : []),
-          { name: "Claim", path: `/claim/${slug}` },
+          { name: "Claimen", path: `/claim/${slug}` },
         ]}
       />
 
       <h1 className="mt-4 text-2xl font-semibold tracking-tight">
-        Claim {listing?.name ?? `this ${directory.listing.singularLower}`}
+        {listing?.name ?? "Deze pagina"} claimen
       </h1>
       <p className="mt-2 max-w-xl text-[var(--color-ink-muted)]">
-        Tell us who you are and what needs changing. We read every message
-        and update the page by hand — there is no account to create.
+        Vertel wie u bent en wat er moet veranderen. Elk bericht wordt gelezen
+        en de pagina wordt met de hand bijgewerkt — u hoeft geen account te
+        maken.
       </p>
 
       <div className="mt-8">
         <SubmissionForm
           action={submitClaim}
           listingSlug={slug}
-          submitLabel="Send request"
+          submitLabel="Verzoek versturen"
           fields={[
-            { name: "name", label: "Your name", required: true },
+            { name: "name", label: "Uw naam", required: true },
             {
               name: "email",
-              label: "Email",
+              label: "E-mailadres",
               type: "email",
               required: true,
-              hint: "We reply to this address and nowhere else.",
+              hint: "We antwoorden op dit adres en nergens anders.",
             },
             {
               name: "organisation",
-              label: "Your role or relationship",
-              hint: `For example: founder, marketing lead, agency working with this ${directory.listing.singularLower}.`,
+              label: "Uw rol of band met het bedrijf",
+              hint: "Bijvoorbeeld: zaakvoerder, medewerker, of het bureau dat de site beheert.",
             },
             {
               name: "message",
-              label: "What should change?",
+              label: "Wat moet er veranderen?",
               type: "textarea",
             },
           ]}
@@ -107,7 +108,7 @@ export default async function ClaimPage({ params }: { params: Params }) {
 
       <p className="mt-8 text-sm text-[var(--color-ink-muted)]">
         <Link href="/directory" className="text-[var(--color-accent)] hover:underline">
-          ← Back to the {directory.listing.pluralLower}
+          ← Terug naar alle {directory.listing.pluralLower}
         </Link>
       </p>
     </div>

@@ -54,12 +54,12 @@ export function ListingCard({ listing }: { listing: ListingCardData }) {
         <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs text-[var(--color-ink-muted)]">
           {listing.verified ? (
             <span className="rounded bg-[var(--color-surface)] px-1.5 py-0.5 font-medium text-[var(--color-ink)]">
-              Verified
+              Geverifieerd
             </span>
           ) : null}
           {listing.featured ? (
             <span className="rounded bg-[var(--color-surface)] px-1.5 py-0.5 font-medium text-[var(--color-ink)]">
-              Featured
+              Uitgelicht
             </span>
           ) : null}
 
@@ -86,7 +86,7 @@ export function ListingList({ listings }: { listings: ListingCardData[] }) {
   if (listings.length === 0) {
     return (
       <p className="py-10 text-sm text-[var(--color-ink-muted)]">
-        No {directory.listing.pluralLower} match this view.
+        Geen {directory.listing.pluralLower} gevonden voor deze selectie.
       </p>
     );
   }

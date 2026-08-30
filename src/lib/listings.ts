@@ -257,6 +257,37 @@ export async function getCountries(): Promise<string[]> {
     .filter((country): country is string => Boolean(country));
 }
 
+export type CityWithCount = { city: string; listingCount: number };
+
+/**
+ * Towns at least one published listing is based in, busiest first.
+ *
+ * The closest thing to a location axis the data has, and derived rather
+ * than declared on purpose: a hand-maintained list of municipalities drifts
+ * from the dataset the first time a row is added, and then the homepage
+ * links to a town with nothing behind it.
+ */
+export async function getCitiesWithCounts(
+  limit = 12,
+): Promise<CityWithCount[]> {
+  if (!directory.features.locations) return [];
+
+  const rows = await prisma.listing.groupBy({
+    by: ["city"],
+    where: { ...PUBLISHED_ONLY, city: { not: null } },
+    _count: { _all: true },
+  });
+
+  return rows
+    .flatMap((row) =>
+      row.city ? [{ city: row.city, listingCount: row._count._all }] : [],
+    )
+    .sort(
+      (a, b) => b.listingCount - a.listingCount || a.city.localeCompare(b.city),
+    )
+    .slice(0, limit);
+}
+
 /** Homepage strip. Featured first, newest next, capped. */
 export async function getSelectedListings(limit = 6): Promise<ListingCard[]> {
   return prisma.listing.findMany({

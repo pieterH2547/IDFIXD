@@ -226,15 +226,15 @@ export const submissionSchema = z
   .object({
     kind: submissionKindSchema,
     listingSlug: z.string().trim().max(120).optional(),
-    name: z.string().trim().min(1, "Your name is required").max(160),
-    email: z.string().trim().email("A valid email address is required").max(200),
+    name: z.string().trim().min(1, "Uw naam is verplicht").max(160),
+    email: z.string().trim().email("Vul een geldig e-mailadres in").max(200),
     organisation: optionalText(200),
     websiteUrl: optionalUrl,
     message: optionalText(4_000),
   })
   .refine(
     (value) => value.kind !== "SUGGESTION" || Boolean(value.organisation),
-    { message: "A name is required", path: ["organisation"] },
+    { message: "De naam van het bedrijf is verplicht", path: ["organisation"] },
   );
 
 export type SubmissionInput = z.infer<typeof submissionSchema>;

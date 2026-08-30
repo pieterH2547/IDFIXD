@@ -35,14 +35,14 @@ export function DirectoryFilters({
             htmlFor="q"
             className="mb-1 block text-xs font-medium text-[var(--color-ink-muted)]"
           >
-            Search
+            Zoeken
           </label>
           <input
             id="q"
             name="q"
             type="search"
             defaultValue={current.q ?? ""}
-            placeholder={`Search ${directory.listing.pluralLower}`}
+            placeholder={`Zoek in ${directory.listing.pluralLower}`}
             className="w-full rounded-md border border-[var(--color-line)] bg-white px-3 py-2 text-sm"
           />
         </div>
@@ -53,7 +53,7 @@ export function DirectoryFilters({
           htmlFor="category"
           className="mb-1 block text-xs font-medium text-[var(--color-ink-muted)]"
         >
-          Category
+          Categorie
         </label>
         <select
           id="category"
@@ -61,7 +61,7 @@ export function DirectoryFilters({
           defaultValue={current.category ?? ""}
           className="w-full rounded-md border border-[var(--color-line)] bg-white px-3 py-2 text-sm"
         >
-          <option value="">All categories</option>
+          <option value="">Alle categorieën</option>
           {categories.map((category) => (
             <option key={category.slug} value={category.slug}>
               {category.name} ({category.listingCount})
@@ -76,7 +76,7 @@ export function DirectoryFilters({
             htmlFor="country"
             className="mb-1 block text-xs font-medium text-[var(--color-ink-muted)]"
           >
-            Country
+            Land
           </label>
           <select
             id="country"
@@ -84,7 +84,7 @@ export function DirectoryFilters({
             defaultValue={current.country ?? ""}
             className="w-full rounded-md border border-[var(--color-line)] bg-white px-3 py-2 text-sm"
           >
-            <option value="">All countries</option>
+            <option value="">Alle landen</option>
             {countries.map((country) => (
               <option key={country} value={country}>
                 {country}
@@ -98,7 +98,7 @@ export function DirectoryFilters({
         type="submit"
         className="rounded-md bg-[var(--color-accent)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--color-accent-hover)]"
       >
-        Apply
+        Filteren
       </button>
     </form>
   );

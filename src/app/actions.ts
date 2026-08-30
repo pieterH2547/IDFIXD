@@ -43,14 +43,14 @@ async function submit(
         errors[field] = issue.message;
       }
     }
-    return { ok: false, message: "Please check the fields below.", errors };
+    return { ok: false, message: "Controleer de velden hieronder.", errors };
   }
 
   await prisma.submission.create({ data: parsed.data });
 
   return {
     ok: true,
-    message: "Thanks — we have your message and will be in touch.",
+    message: "Bedankt — uw bericht is binnen. We nemen contact op.",
     errors: {},
   };
 }
