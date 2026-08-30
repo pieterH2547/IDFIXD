@@ -115,10 +115,19 @@ export default async function HomePage() {
                     {service.blurb}
                   </span>
                   <span className="mt-2 block text-xs text-[var(--color-ink-muted)]">
-                    {service.category.listingCount}{" "}
-                    {service.category.listingCount === 1
-                      ? directory.listing.singularLower
-                      : directory.listing.pluralLower}
+                    {/*
+                      "0 boomverzorgers" is true and useless: it reads as a
+                      broken site rather than as work in progress. Nobody has
+                      been assigned to a service yet, because which company
+                      does what is not something to guess.
+                    */}
+                    {service.category.listingCount > 0
+                      ? `${service.category.listingCount} ${
+                          service.category.listingCount === 1
+                            ? directory.listing.singularLower
+                            : directory.listing.pluralLower
+                        }`
+                      : "toewijzing volgt"}
                   </span>
                 </Link>
               </li>
