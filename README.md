@@ -1,11 +1,10 @@
 # IDFIXD
 
-Nieuwe, losstaande repository. Nog geen stack of scope vastgelegd.
+Nieuw project. Scope en stack nog niet vastgelegd.
 
 ## Status
 
-Leeg startpunt. Deze repo staat volledig los van SourcrLab: geen gedeelde code,
-geen gedeelde doctrine, geen gedeelde deploys.
+Leeg startpunt — alleen deze README en een `.gitignore`.
 
 ## Volgende stappen
 
