@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { directory } from "@/config/directory";
+import { directory, resolveSiteUrl, TITLE_TEMPLATE } from "@/config/directory";
 import { branding } from "@/config/branding";
 import { attributesSchema, parseAttributes } from "@/config/attributes";
 
@@ -53,9 +53,89 @@ describe("config-driven naming", () => {
     }
   });
 
+  it("derives the title template from siteName, so renaming needs one edit", () => {
+    expect(TITLE_TEMPLATE).toBe(`%s | ${directory.siteName}`);
+    expect(TITLE_TEMPLATE).toContain("%s");
+  });
+
+  it("ships no nav label naming the entity, which renaming would strand", () => {
+    const labels = [...directory.nav, ...directory.footerNav].map((item) =>
+      item.label.toLowerCase(),
+    );
+    for (const label of labels) {
+      expect(label, `nav label "${label}"`).not.toContain(
+        directory.listing.singularLower,
+      );
+      expect(label, `nav label "${label}"`).not.toContain(
+        directory.listing.pluralLower,
+      );
+    }
+  });
+
   it("points its primary CTA at a route that exists", () => {
     expect(["/directory", "/categories"]).toContain(
       directory.primaryCta.href,
+    );
+  });
+});
+
+describe("site origin", () => {
+  const PREVIEW_HOST = "my-app-git-branch-team.vercel.app";
+  const PRODUCTION = "https://acquisitionfirms.example";
+
+  it("uses the configured origin in production", () => {
+    expect(
+      resolveSiteUrl({
+        NEXT_PUBLIC_SITE_URL: PRODUCTION,
+        VERCEL_ENV: "production",
+      }),
+    ).toBe(PRODUCTION);
+  });
+
+  it("never lets a preview claim the production origin", () => {
+    // The common Vercel setup: one NEXT_PUBLIC_SITE_URL for every
+    // environment. Without the preview branch, every preview page would
+    // canonicalise into the live site.
+    expect(
+      resolveSiteUrl({
+        NEXT_PUBLIC_SITE_URL: PRODUCTION,
+        VERCEL_ENV: "preview",
+        VERCEL_URL: PREVIEW_HOST,
+      }),
+    ).toBe(`https://${PREVIEW_HOST}`);
+  });
+
+  it("never lets a preview fall back to the template placeholder", () => {
+    // The other setup: NEXT_PUBLIC_SITE_URL on Production only. The
+    // fallback would be `directory.siteUrl` — a domain nobody owns.
+    expect(
+      resolveSiteUrl({
+        VERCEL_ENV: "preview",
+        VERCEL_URL: PREVIEW_HOST,
+      }),
+    ).toBe(`https://${PREVIEW_HOST}`);
+  });
+
+  it("reads the NEXT_PUBLIC_ system variables too", () => {
+    expect(
+      resolveSiteUrl({
+        NEXT_PUBLIC_SITE_URL: PRODUCTION,
+        NEXT_PUBLIC_VERCEL_ENV: "preview",
+        NEXT_PUBLIC_VERCEL_URL: PREVIEW_HOST,
+      }),
+    ).toBe(`https://${PREVIEW_HOST}`);
+  });
+
+  it("keeps the configured origin off Vercel entirely", () => {
+    expect(resolveSiteUrl({ NEXT_PUBLIC_SITE_URL: "http://localhost:3000" })).toBe(
+      "http://localhost:3000",
+    );
+    expect(resolveSiteUrl({})).toBe(directory.siteUrl);
+  });
+
+  it("strips a trailing slash however the origin was supplied", () => {
+    expect(resolveSiteUrl({ NEXT_PUBLIC_SITE_URL: `${PRODUCTION}/` })).toBe(
+      PRODUCTION,
     );
   });
 });

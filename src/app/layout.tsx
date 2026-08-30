@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { directory, SITE_URL } from "@/config/directory";
+import { directory, SITE_URL, TITLE_TEMPLATE } from "@/config/directory";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { JsonLd } from "@/components/json-ld";
 import { organizationJsonLd, websiteJsonLd } from "@/lib/seo/json-ld";
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
     default: directory.siteName,
-    template: directory.seo.titleTemplate,
+    template: TITLE_TEMPLATE,
   },
   description: directory.siteDescription,
   applicationName: directory.siteName,

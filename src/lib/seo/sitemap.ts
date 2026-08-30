@@ -12,10 +12,10 @@ import {
  * the pages use. `app/sitemap.ts` is the thin half: it queries, then calls
  * this.
  *
- * Nothing here is hardcoded. SourcrLab's sitemap carried eight
- * `LAST_SIGNIFICANT_UPDATE` constants that a human had to remember to bump,
- * which means `lastModified` was accurate exactly until the first time
- * someone forgot. `updatedAt` from the row is always true.
+ * Nothing here is hardcoded. `lastModified` comes from the row's
+ * `updatedAt`, never from a constant someone has to remember to bump —
+ * a hand-maintained timestamp is accurate exactly until the first time it
+ * is forgotten, and then it lies silently.
  */
 
 export type SitemapListing = {

@@ -119,13 +119,19 @@ filter before it publishes a draft.
 
 ## Deployment
 
-Push to GitHub, import the repository in Vercel, and set:
+Push to GitHub, import the repository in Vercel, and set three variables on
+both Production and Preview:
 
 - `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN`
 - `NEXT_PUBLIC_SITE_URL` — your production origin, no trailing slash
 
-Set `NEXT_PUBLIC_SITE_URL` per environment. Without it, preview deployments
-emit canonical URLs claiming to be production.
+Do not set `DATABASE_URL` in Vercel; it is local-only.
+
+Preview deployments never use the production origin even though
+`NEXT_PUBLIC_SITE_URL` is set for them: `resolveSiteUrl()` uses the
+deployment's own host whenever `VERCEL_ENV=preview`, so a preview
+canonicalises to itself. See
+[`docs/NEW-DIRECTORY.md`](docs/NEW-DIRECTORY.md#why-previews-stay-off-the-production-origin).
 
 ## Creating a new directory
 

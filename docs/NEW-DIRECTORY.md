@@ -182,17 +182,48 @@ also how you push a content update later.
 
 ## 10. Deploy
 
-Import the repository in Vercel and set the environment variables:
+Import the repository in Vercel and set exactly three environment
+variables:
 
-| Variable | Value |
+| Variable | Environments | Value |
+| --- | --- | --- |
+| `TURSO_DATABASE_URL` | Production, Preview | `libsql://…` |
+| `TURSO_AUTH_TOKEN` | Production, Preview | the token |
+| `NEXT_PUBLIC_SITE_URL` | Production, Preview | `https://your-domain.example` — no trailing slash |
+
+That is the whole list. `DATABASE_URL` is local-only and must **not** be set
+in Vercel: `TURSO_DATABASE_URL` wins when present, and leaving `DATABASE_URL`
+out means a missing Turso URL fails the deploy instead of quietly falling
+back to a SQLite file that does not exist in the deployment.
+
+Preview deployments share the production database here, which is what you
+want for a directory: previews should show the real dataset. If you would
+rather they did not, create a second Turso database and set the Preview
+values to it.
+
+### Why previews stay off the production origin
+
+Setting `NEXT_PUBLIC_SITE_URL` on Preview as well looks wrong and is not.
+`resolveSiteUrl()` in `src/config/directory.ts` ignores it when Vercel
+reports `VERCEL_ENV=preview`, and uses the deployment's own host instead.
+So a preview canonicalises to itself no matter how the variable is scoped:
+
+| Situation | Origin used |
 | --- | --- |
-| `TURSO_DATABASE_URL` | `libsql://…` |
-| `TURSO_AUTH_TOKEN` | the token |
-| `NEXT_PUBLIC_SITE_URL` | `https://your-domain.example` — no trailing slash |
+| Production | `NEXT_PUBLIC_SITE_URL` |
+| Preview, variable set for all environments | the preview's own `*.vercel.app` host |
+| Preview, variable set for Production only | the preview's own `*.vercel.app` host |
+| Local | `NEXT_PUBLIC_SITE_URL` from `.env` |
 
-Set `NEXT_PUBLIC_SITE_URL` per environment. If preview deployments inherit
-the production value, they emit canonical URLs and a sitemap claiming to be
-production, which is exactly the kind of thing that gets a preview indexed.
+Without that, both of the ways people normally configure Vercel produce a
+broken preview: the first makes every preview page canonicalise into the
+live site, and the second falls back to the placeholder `siteUrl` in config
+— a canonical pointing at a domain you do not own.
+
+Vercel also serves preview deployments with `X-Robots-Tag: noindex` by
+default. Worth confirming on your first preview (`curl -sI <preview-url> |
+grep -i x-robots-tag`), because the canonical is the second line of defence,
+not the first.
 
 ## 11. Configure the domain
 

@@ -58,8 +58,13 @@ export type DirectoryConfig = {
   footerNav: NavItem[];
 
   seo: {
-    /** `%s` is replaced by the page title. */
-    titleTemplate: string;
+    /**
+     * `%s` is replaced by the page title. Omit it and the template is
+     * derived from `siteName`, which is what you want — see
+     * `TITLE_TEMPLATE` below for why a second copy of the brand name is a
+     * trap. Set it only when the suffix genuinely differs from the name.
+     */
+    titleTemplate?: string;
     /** Absolute or root-relative path to the default social image. */
     defaultOgImage: string | null;
     twitterHandle: string | null;
@@ -115,11 +120,12 @@ export const directory: DirectoryConfig = {
   footerNav: [
     { label: "Directory", href: "/directory" },
     { label: "Categories", href: "/categories" },
-    { label: "Suggest a listing", href: "/suggest" },
+    // Entity-neutral on purpose: a label saying "Suggest a listing" would
+    // still say "listing" after `listing.singular` became "Firm".
+    { label: "Suggest an addition", href: "/suggest" },
   ],
 
   seo: {
-    titleTemplate: "%s | Directory Starter",
     defaultOgImage: null,
     twitterHandle: null,
     organizationType: "Organization",
@@ -150,9 +156,45 @@ export const directory: DirectoryConfig = {
 /**
  * The site's own origin, without a trailing slash.
  *
- * Reads the environment first so one build can serve a preview deployment
- * and production without the canonical URLs lying about which one it is.
+ * A preview deployment must never claim to be production. Both of the ways
+ * people actually configure Vercel get that wrong if the origin is just
+ * `NEXT_PUBLIC_SITE_URL ?? siteUrl`:
+ *
+ * - set `NEXT_PUBLIC_SITE_URL` for every environment, which is the obvious
+ *   thing to do, and every preview page canonicalises into the live site;
+ * - set it for Production only, and previews fall back to `siteUrl` — the
+ *   template placeholder, so the canonical points at a domain you do not
+ *   own.
+ *
+ * So a Vercel preview always uses its own deployment host, whatever the
+ * environment variables say. Vercel additionally serves preview
+ * deployments with `X-Robots-Tag: noindex` by default; this keeps the
+ * canonical honest even if that is ever turned off.
  */
-export const SITE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL ?? directory.siteUrl
-).replace(/\/+$/, "");
+export function resolveSiteUrl(
+  env: Record<string, string | undefined> = process.env,
+): string {
+  const isPreview =
+    (env.NEXT_PUBLIC_VERCEL_ENV ?? env.VERCEL_ENV) === "preview";
+  const deploymentHost = env.NEXT_PUBLIC_VERCEL_URL ?? env.VERCEL_URL;
+
+  if (isPreview && deploymentHost) {
+    return `https://${deploymentHost}`.replace(/\/+$/, "");
+  }
+
+  return (env.NEXT_PUBLIC_SITE_URL ?? directory.siteUrl).replace(/\/+$/, "");
+}
+
+export const SITE_URL = resolveSiteUrl();
+
+/**
+ * The `title.template` for the root layout.
+ *
+ * Derived from `siteName` rather than configured beside it. A separate
+ * `titleTemplate: "%s | Directory Starter"` repeats the brand name, and
+ * renaming the site while forgetting the second copy leaves every page
+ * title carrying the old brand — silently, because nothing else on the
+ * page looks wrong.
+ */
+export const TITLE_TEMPLATE =
+  directory.seo.titleTemplate ?? `%s | ${directory.siteName}`;
