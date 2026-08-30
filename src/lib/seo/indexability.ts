@@ -19,7 +19,7 @@ import { directory } from "@/config/directory";
  * result, would it answer them?*
  */
 
-export type PageKind = "home" | "static" | "listing" | "category";
+export type PageKind = "home" | "static" | "listing" | "category" | "legal";
 
 export type IndexDecision = {
   index: boolean;
@@ -73,6 +73,20 @@ export function categoryIndexDecision(
   }
 
   return INDEX;
+}
+
+/**
+ * A legal page is indexable exactly when its text exists.
+ *
+ * Deriving this from the text rather than from a separate flag is the whole
+ * design: an unwritten terms page that is nevertheless indexed is a real
+ * cost — it ranks for the site's own name, and what it shows a visitor
+ * looking for the terms is that there are none.
+ */
+export function legalIndexDecision(body: string | null): IndexDecision {
+  return body && body.trim().length > 0
+    ? INDEX
+    : { index: false, reason: "document not published yet" };
 }
 
 /**

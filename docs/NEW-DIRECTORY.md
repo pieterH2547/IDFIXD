@@ -60,6 +60,48 @@ raise it for a large dataset.
 
 Also update `package.json`'s `name` and `description`.
 
+### The publisher block
+
+`company` names who legally publishes the directory, and the footer renders
+it on every page. It defaults to ID Fix BV, so if that is the publisher you
+change nothing:
+
+```ts
+company: {
+  name: "ID Fix BV",
+  registeredOffice: "2547 Lint, België",
+  vat: "BE 0776.358.207",
+},
+```
+
+If a different entity publishes this directory, change all three. Never
+leave a placeholder VAT number: a fake registration number is worse than
+none, because it is checkable and it fails the check. A test rejects the
+obvious placeholders.
+
+### The legal texts
+
+`/terms` and `/privacy` exist and are linked from the footer, but their
+content is `null` until you paste it in:
+
+```ts
+legal: {
+  terms: null,
+  privacy: null,
+},
+```
+
+While a text is `null` that page renders the publisher details plus a plain
+statement that the document is not published, stays `noindex`, and stays out
+of the sitemap. The footer shows a "Legal texts not yet published" marker.
+Pasting the text in flips all four at once — there is no separate flag to
+forget.
+
+Have a lawyer write them. This directory collects names and email addresses
+through the claim and suggestion forms, so a privacy statement is a legal
+requirement in the EU, not a formality — and a generated one is a liability
+rather than protection.
+
 ## 3. Change the branding
 
 Edit `src/config/branding.ts` for the wordmark, logo and colours. If you

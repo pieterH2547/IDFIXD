@@ -3,6 +3,7 @@ import { directory } from "@/config/directory";
 import { canonical } from "@/lib/seo/canonical";
 import {
   categoryIndexDecision,
+  legalIndexDecision,
   listingIndexDecision,
 } from "@/lib/seo/indexability";
 
@@ -68,6 +69,20 @@ export function buildSitemap({
   if (directory.features.suggestions) {
     entries.push({
       url: canonical("/suggest"),
+      changeFrequency: "yearly",
+      priority: 0.2,
+    });
+  }
+
+  // Legal pages enter the sitemap only once their text exists — the same
+  // condition that makes them indexable, read from the same function.
+  for (const [path, body] of [
+    ["/terms", directory.legal.terms],
+    ["/privacy", directory.legal.privacy],
+  ] as const) {
+    if (!legalIndexDecision(body).index) continue;
+    entries.push({
+      url: canonical(path),
       changeFrequency: "yearly",
       priority: 0.2,
     });

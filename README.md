@@ -102,6 +102,12 @@ suggestions, tags and sources.
 `src/config/attributes.ts` defines the niche-specific fields a listing may
 carry.
 
+The same file carries the publisher's legal identity (`company`), rendered
+in the footer on every page, and the `/terms` and `/privacy` texts
+(`legal`). A legal text left as `null` makes its page render a plain
+"not published yet" notice, stay `noindex` and stay out of the sitemap —
+one value, no flag to forget.
+
 No component contains a user-visible noun. Renaming "listing" to "investor"
 or "supplier" is one edit in one file.
 

@@ -3,6 +3,7 @@ import { canonical } from "@/lib/seo/canonical";
 import {
   categoryIndexDecision,
   filteredViewDecision,
+  legalIndexDecision,
   listingIndexDecision,
   robotsFor,
 } from "@/lib/seo/indexability";
@@ -78,6 +79,15 @@ describe("indexability decisions", () => {
     expect(
       categoryIndexDecision({ published: true, listingCount: minimum }).index,
     ).toBe(true);
+  });
+
+  it("never indexes an unwritten legal page", () => {
+    expect(legalIndexDecision(null).index).toBe(false);
+    expect(legalIndexDecision("   ").index).toBe(false);
+  });
+
+  it("indexes a legal page once it has text", () => {
+    expect(legalIndexDecision("These terms apply to…").index).toBe(true);
   });
 
   it("never indexes a filtered view", () => {
@@ -158,5 +168,16 @@ describe("sitemap", () => {
 
   it("never lists the claim form", () => {
     expect(urls.some((url) => url.includes("/claim/"))).toBe(false);
+  });
+
+  it("keeps unwritten legal pages out of the sitemap", () => {
+    // Both are null in the shipped config. A stub terms page in the sitemap
+    // invites Google to rank an empty document for the site's own name.
+    if (directory.legal.terms === null) {
+      expect(urls).not.toContain(`${SITE_URL}/terms`);
+    }
+    if (directory.legal.privacy === null) {
+      expect(urls).not.toContain(`${SITE_URL}/privacy`);
+    }
   });
 });

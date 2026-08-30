@@ -140,6 +140,39 @@ describe("site origin", () => {
   });
 });
 
+describe("publisher identity", () => {
+  const { company } = directory;
+
+  it("names a real publisher, not a placeholder", () => {
+    for (const [field, value] of Object.entries(company)) {
+      expect(value.trim().length, `company.${field}`).toBeGreaterThan(0);
+      // The failure mode this guards against is a template placeholder
+      // reaching production. A fake registration number is worse than none:
+      // it is checkable, and it fails the check.
+      expect(value.toLowerCase(), `company.${field}`).not.toMatch(
+        /example|placeholder|your company|todo|xxx|123456789/,
+      );
+    }
+  });
+
+  it("carries a VAT number in a recognisable register format", () => {
+    // Two letters, then digits and separators. Deliberately not a
+    // country-specific checksum: this has to accept whatever register the
+    // directory's publisher is in.
+    expect(company.vat).toMatch(/^[A-Z]{2}[\s.]?[\d.\s-]{8,}$/);
+  });
+
+  it("treats an unwritten legal document as absent, not as empty text", () => {
+    // `""` would render as a published-but-blank page and would be indexed.
+    // `null` is the only way to say "not written yet".
+    for (const [name, value] of Object.entries(directory.legal)) {
+      expect(value === null || value.trim().length > 0, `legal.${name}`).toBe(
+        true,
+      );
+    }
+  });
+});
+
 describe("branding", () => {
   it("keeps the CSS tokens and the branding object in agreement", () => {
     const css = readFileSync(join(SRC, "app", "globals.css"), "utf8");
