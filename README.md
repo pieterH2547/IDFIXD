@@ -30,6 +30,33 @@ Gekloond van [`pieterH2547/IDFIXD`](https://github.com/pieterH2547/IDFIXD)
 - Logo en favicon: `branding.logoSrc` is `null` (tekstwoordmerk),
   `faviconEmoji` staat op 🌳.
 
+### Tijdelijk online zetten (demo)
+
+`vercel.json` maakt een demo-deploy mogelijk **zonder Turso**: de build voert
+`db:push` en `import` uit, zodat de SQLite-database in de build-container uit
+`data/` wordt opgebouwd, en `outputFileTracingIncludes` in `next.config.ts`
+stuurt dat bestand mee de serverless bundle in voor `/directory`.
+
+Importeer de repo in Vercel en deploy — er hoeft geen enkele omgevingsvariabele
+gezet te worden. Serveert `/directory` een 500, zet dan alsnog
+`DATABASE_URL=file:./prisma/dev.db` in de projectinstellingen: de `env`-sleutel
+in `vercel.json` is de oudere manier en wordt niet in elke configuratie
+gehonoreerd.
+
+Twee dingen die deze opzet bewust doet, en waarom ze weg moeten vóór lancering:
+
+- `X-Robots-Tag: noindex` op elke response. Deze demo toont voorbeelddata; die
+  hoort niet in Google.
+- De data is read-only en bevriest op het moment van de build. Formulieren
+  schrijven naar een bestand in een serverless functie en dat overleeft de
+  request niet.
+
+Voor een echte deploy verwijder je `vercel.json` en volg je stap 9 en 10 van
+[`docs/NEW-DIRECTORY.md`](docs/NEW-DIRECTORY.md): een Turso-database plus
+`TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN` en `NEXT_PUBLIC_SITE_URL`.
+`TURSO_DATABASE_URL` wint van `DATABASE_URL` in `src/lib/db.ts`, dus die
+overgang is één set variabelen.
+
 De rest van dit document is de documentatie van de starter zelf.
 
 ## Stack

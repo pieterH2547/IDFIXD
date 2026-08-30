@@ -17,6 +17,17 @@ const nextConfig: NextConfig = {
   // without a trailing slash. This keeps the server from disagreeing.
   trailingSlash: false,
 
+  // Ship the SQLite file into the serverless bundle.
+  //
+  // Only the demo deployment needs this. `/directory` renders on demand, so
+  // its function reads the database at request time, and the file the build
+  // seeded is not traced automatically because no module imports it. A real
+  // deployment sets TURSO_DATABASE_URL, which wins over DATABASE_URL in
+  // src/lib/db.ts and makes this line dead weight rather than wrong.
+  outputFileTracingIncludes: {
+    "/**": ["prisma/dev.db"],
+  },
+
   images: {
     // Add the hosts your logos come from. Left empty on purpose: an empty
     // list fails loudly on the first remote image instead of quietly
