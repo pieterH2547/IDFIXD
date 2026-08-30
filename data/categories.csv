@@ -1,0 +1,4 @@
+slug,name,description,seo_title,seo_description,published,sort_order
+advisory,Advisory,"Firms that advise on strategy, transactions and organisational change.",Advisory firms,"Independent advisory firms, with what each one focuses on and where they work.",yes,10
+technology,Technology,Product and platform builders selling to other businesses.,Technology providers,"B2B technology providers, what they build and who they build it for.",yes,20
+operations,Operations,"Delivery, logistics and industrial operations specialists.",Operations specialists,"Operations and delivery specialists, by focus and location.",yes,30

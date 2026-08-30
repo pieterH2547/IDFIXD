@@ -1,0 +1,97 @@
+import type { MetadataRoute } from "next";
+import { directory } from "@/config/directory";
+import { canonical } from "@/lib/seo/canonical";
+import {
+  categoryIndexDecision,
+  listingIndexDecision,
+} from "@/lib/seo/indexability";
+
+/**
+ * Building the sitemap is separated from fetching the rows so the rule can
+ * be tested without a database — and so the rule is visibly the same one
+ * the pages use. `app/sitemap.ts` is the thin half: it queries, then calls
+ * this.
+ *
+ * Nothing here is hardcoded. SourcrLab's sitemap carried eight
+ * `LAST_SIGNIFICANT_UPDATE` constants that a human had to remember to bump,
+ * which means `lastModified` was accurate exactly until the first time
+ * someone forgot. `updatedAt` from the row is always true.
+ */
+
+export type SitemapListing = {
+  slug: string;
+  status: string;
+  shortDescription: string | null;
+  description: string | null;
+  updatedAt: Date;
+};
+
+export type SitemapCategory = {
+  slug: string;
+  published: boolean;
+  listingCount: number;
+  updatedAt: Date;
+};
+
+export type SitemapInput = {
+  listings: SitemapListing[];
+  categories: SitemapCategory[];
+  /** Newest listing update, used as the homepage's lastModified. */
+  lastContentUpdate?: Date;
+};
+
+export function buildSitemap({
+  listings,
+  categories,
+  lastContentUpdate,
+}: SitemapInput): MetadataRoute.Sitemap {
+  const entries: MetadataRoute.Sitemap = [
+    {
+      url: canonical("/"),
+      lastModified: lastContentUpdate,
+      changeFrequency: "weekly",
+      priority: 1,
+    },
+    {
+      url: canonical("/directory"),
+      lastModified: lastContentUpdate,
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    {
+      url: canonical("/categories"),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+  ];
+
+  if (directory.features.suggestions) {
+    entries.push({
+      url: canonical("/suggest"),
+      changeFrequency: "yearly",
+      priority: 0.2,
+    });
+  }
+
+  for (const category of categories) {
+    if (!categoryIndexDecision(category).index) continue;
+    entries.push({
+      url: canonical(`/category/${category.slug}`),
+      lastModified: category.updatedAt,
+      changeFrequency: "weekly",
+      priority: 0.8,
+    });
+  }
+
+  for (const listing of listings) {
+    if (!listingIndexDecision(listing).index) continue;
+    entries.push({
+      url: canonical(`/directory/${listing.slug}`),
+      lastModified: listing.updatedAt,
+      changeFrequency: "monthly",
+      priority: 0.7,
+    });
+  }
+
+  return entries;
+}

@@ -1,0 +1,156 @@
+// Seven models. That is the whole domain.
+//
+// The rule that keeps it seven: a field is a column only if every kind of
+// directory we expect to build needs it. Everything niche-specific goes
+// into `Listing.attributes`, a JSON string validated by a Zod schema in
+// `src/config/attributes.ts`. See docs/ARCHITECTURE.md for why that line
+// is drawn where it is.
+//
+// SQLite has no enum type, so `status` and `kind` are strings. The Zod
+// schemas in src/lib/validation are what actually constrain them, and the
+// importer refuses anything else.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Prisma 7 takes the connection URL from prisma.config.ts (CLI) and from
+// the driver adapter in src/lib/db.ts (application), not from here.
+datasource db {
+  provider = "sqlite"
+}
+
+/// The one entity this directory lists. Rename the *display* words in
+/// src/config/directory.ts (listing.singular / listing.plural) rather than
+/// renaming this model — the model name never reaches a user's screen.
+model Listing {
+  id     String @id @default(cuid())
+  name   String
+  slug   String @unique
+  /// DRAFT | PUBLISHED | ARCHIVED — see listingStatusSchema.
+  status String @default("DRAFT")
+
+  shortDescription String?
+  description      String?
+  websiteUrl       String?
+  logoUrl          String?
+
+  country String?
+  city    String?
+
+  pricingText String?
+
+  featured Boolean @default(false)
+  verified Boolean @default(false)
+
+  /// Niche-specific structured fields as JSON. Validated on write by the
+  /// importer and on read by `parseAttributes`. Never queried by key —
+  /// anything you need to filter or sort on belongs in a column.
+  attributes String @default("{}")
+
+  publishedAt    DateTime?
+  lastVerifiedAt DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  categories ListingCategory[]
+  tags       ListingTag[]
+  sources    Source[]
+
+  @@index([status])
+  @@index([featured])
+  @@index([country])
+}
+
+model Category {
+  id          String  @id @default(cuid())
+  name        String
+  slug        String  @unique
+  description String?
+
+  seoTitle       String?
+  seoDescription String?
+
+  /// An unpublished category renders 404 and never enters the sitemap.
+  published Boolean @default(true)
+  /// Controls display order on /categories and in filters. Ties break by name.
+  sortOrder Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  listings ListingCategory[]
+
+  @@index([published])
+}
+
+/// A light label. Deliberately has no route of its own: tags feed search
+/// and the listing page, categories are what gets indexed.
+model Tag {
+  id   String @id @default(cuid())
+  name String
+  slug String @unique
+
+  listings ListingTag[]
+}
+
+model ListingCategory {
+  listing    Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  listingId  String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  categoryId String
+
+  @@id([listingId, categoryId])
+  @@index([categoryId])
+}
+
+model ListingTag {
+  listing   Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  listingId String
+  tag       Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  tagId     String
+
+  @@id([listingId, tagId])
+  @@index([tagId])
+}
+
+/// Where a fact on a listing came from. Directories built from public
+/// research need to be able to answer "how do you know that?" a year later.
+model Source {
+  id        String    @id @default(cuid())
+  listing   Listing   @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  listingId String
+  url       String
+  label     String?
+  checkedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  @@unique([listingId, url])
+  @@index([listingId])
+}
+
+/// Claims and suggestions in one table. Both are "someone typed four
+/// fields into a form and we want to read them later" — separate models
+/// would duplicate the schema, the validation and the server action to
+/// express a difference that only exists in the URL.
+model Submission {
+  id   String @id @default(cuid())
+  /// CLAIM | SUGGESTION — see submissionKindSchema.
+  kind String
+
+  /// Set for claims: which listing is being claimed. Not a foreign key on
+  /// purpose, so deleting a listing never destroys the record of someone
+  /// having contacted us about it.
+  listingSlug String?
+
+  name         String
+  email        String
+  organisation String?
+  websiteUrl   String?
+  message      String?
+
+  createdAt DateTime @default(now())
+
+  @@index([kind])
+  @@index([createdAt])
+}
