@@ -17,6 +17,7 @@
     "db:reset": "prisma db push --force-reset",
     "seed": "tsx scripts/seed.ts",
     "import": "tsx scripts/import.ts",
+    "logos": "tsx scripts/placeholder-logos.ts",
     "verify": "node scripts/verify.mjs",
     "postinstall": "prisma generate || true"
   },

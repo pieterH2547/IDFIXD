@@ -38,6 +38,26 @@ export const attributesSchema = z
     teamSize: z.string().trim().min(1).max(40).optional(),
 
     /**
+     * Municipalities the company serves beyond the one it is based in.
+     *
+     * Free text while nothing queries it. The moment
+     * `/boomverzorgers/[gemeente]` exists this has to become a real table:
+     * SQLite cannot index inside a JSON string, so a page that selects on a
+     * service area cannot select on this.
+     */
+    werkgebied: z.array(z.string().trim().min(1)).max(40).optional(),
+
+    /**
+     * What has actually been checked about this company, and how far.
+     *
+     * These are real businesses. Publishing a page that implies research
+     * nobody did is the failure mode this field exists to prevent: "naam en
+     * standplaats overgenomen, diensten niet geverifieerd" is an honest
+     * state and the page says it out loud.
+     */
+    verificatie: z.string().trim().min(1).max(300).optional(),
+
+    /**
      * Free-form key/value rows rendered in the "Details" table. The escape
      * hatch for facts that do not deserve a schema field of their own.
      */

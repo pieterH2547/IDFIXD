@@ -6,7 +6,24 @@ anything, and it is safe to run twice.
 - **`listings.csv`** — required. `listings.json` is used instead if the CSV is
   absent.
 - **`categories.csv`** — optional. Categories referenced by a listing but not
-  declared here are created automatically with a title-cased name.
+  declared here are created automatically with a title-cased name, on the
+  default axis.
+
+## `categories.csv`
+
+| Column | Required | Notes |
+| --- | --- | --- |
+| `slug`, `name` | name yes | `slug` is derived from `name` when empty. |
+| `description` | no | Shown on `/categories` and on the category page. |
+| `axis` | no | One of `dienst`, `specialisatie`, `certificering`, `materieel`, `klant`, `beschikbaarheid`, `providertype`. Defaults to `dienst`; anything else is an error. |
+| `seo_title`, `seo_description` | no | Override the derived metadata. |
+| `published` | no | `no` makes the category 404 and keeps it out of the sitemap. |
+| `sort_order` | no | Lower sorts first, within its axis. |
+
+There is deliberately no `locatie` axis. A municipality is a place, not a
+category: it lives in `city` and `attributes.werkgebied`. Modelling
+"Brasschaat" as a category beside "Boom snoeien" is what produces
+`/etw/boom-snoeien/particulier/brasschaat` and its two hundred thin siblings.
 
 ## `listings.csv`
 
@@ -18,7 +35,7 @@ anything, and it is safe to run twice.
 | `short_description` | no | One line, shown on cards and used as the meta description. A listing without one is `noindex`. |
 | `description` | no | Long form. Blank lines become paragraphs. |
 | `website_url` | no | Must be `http(s)`. |
-| `logo_url` | no | Must be `http(s)`. Add the host to `images.remotePatterns` in `next.config.ts` if you switch to `next/image`. |
+| `logo_url` | no | An `http(s)` URL, or a path into `/public` such as `/logos/brondel-boomverzorging.svg` — `npm run logos` draws a placeholder mark for every row using the second form. A protocol-relative `//host/path` is refused: that is a remote image wearing a local path. Add the host to `images.remotePatterns` in `next.config.ts` if you switch to `next/image`. |
 | `country`, `city` | no | Shown when `features.locations` is on. |
 | `pricing_text` | no | Free text. Shown when `features.pricing` is on. |
 | `featured` | no | `yes` / `true` / `1` / `x`. Sorts first. |

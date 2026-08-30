@@ -1,6 +1,11 @@
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { directory } from "@/config/directory";
+import {
+  CATEGORY_AXES,
+  CATEGORY_AXIS_LABELS,
+  type CategoryAxis,
+} from "@/lib/validation";
 
 /**
  * Every read the site performs, in one file.
@@ -171,6 +176,7 @@ export type CategoryWithCount = {
   name: string;
   slug: string;
   description: string | null;
+  axis: string;
   published: boolean;
   sortOrder: number;
   listingCount: number;
@@ -194,6 +200,7 @@ export async function getCategoriesWithCounts(options?: {
       name: true,
       slug: true,
       description: true,
+      axis: true,
       published: true,
       sortOrder: true,
       _count: { select: { listings: { where: { listing: PUBLISHED_ONLY } } } },
@@ -209,6 +216,30 @@ export async function getCategoriesWithCounts(options?: {
 
 export async function getCategoryBySlug(slug: string) {
   return prisma.category.findUnique({ where: { slug } });
+}
+
+/**
+ * Categories grouped by axis, in the order `CATEGORY_AXES` declares.
+ *
+ * Grouping happens here rather than in the page because two consumers need
+ * the same order — the category index and the filters — and an axis that
+ * sorts differently in the two of them reads as two different taxonomies.
+ * An axis with no categories is dropped rather than rendered empty.
+ */
+export type CategoryAxisGroup = {
+  axis: CategoryAxis;
+  label: string;
+  categories: CategoryWithCount[];
+};
+
+export function groupCategoriesByAxis(
+  categories: CategoryWithCount[],
+): CategoryAxisGroup[] {
+  return CATEGORY_AXES.map((axis) => ({
+    axis,
+    label: CATEGORY_AXIS_LABELS[axis],
+    categories: categories.filter((category) => category.axis === axis),
+  })).filter((group) => group.categories.length > 0);
 }
 
 export async function getCountries(): Promise<string[]> {

@@ -109,6 +109,7 @@ async function main() {
         slug: category.slug,
         name: category.name,
         description: category.description ?? null,
+        axis: category.axis,
         seoTitle: category.seoTitle ?? null,
         seoDescription: category.seoDescription ?? null,
         published: category.published,
@@ -117,6 +118,7 @@ async function main() {
       update: {
         name: category.name,
         description: category.description ?? null,
+        axis: category.axis,
         seoTitle: category.seoTitle ?? null,
         seoDescription: category.seoDescription ?? null,
         published: category.published,

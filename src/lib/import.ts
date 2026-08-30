@@ -155,6 +155,7 @@ export function parseCategoriesCsv(csv: string): ParseResult<CategoryInput> {
       name: record.name ?? "",
       slug: record.slug,
       description: record.description,
+      axis: record.axis?.trim() || undefined,
       seoTitle: record.seo_title,
       seoDescription: record.seo_description,
       published: record.published ? parseBoolean(record.published) : true,

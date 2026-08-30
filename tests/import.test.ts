@@ -203,4 +203,43 @@ describe("valid imports", () => {
     expect(result.rows[0]?.published).toBe(true);
     expect(result.rows[0]?.sortOrder).toBe(10);
   });
+
+  it("reads a category's axis and defaults it rather than guessing", () => {
+    const result = parseCategoriesCsv(
+      "slug,name,axis\netw,ETW,certificering\nboom-vellen,Boom vellen,\n",
+    );
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.rows[0]?.axis).toBe("certificering");
+    expect(result.rows[1]?.axis).toBe("dienst");
+  });
+
+  it("refuses an axis that is not one of the seven", () => {
+    // "locatie" is the tempting eighth one. Letting it through would create
+    // an axis no page groups by, so the category would disappear from
+    // /categories while still existing and still being linked from listings.
+    expect(
+      parseCategoriesCsv("slug,name,axis\nbrasschaat,Brasschaat,locatie\n").ok,
+    ).toBe(false);
+  });
+
+  it("accepts a logo we host ourselves as well as a remote one", () => {
+    const result = parseListingsCsv(
+      "name,logo_url\nBrondel,/logos/brondel.svg\nZee van Groen,https://example.com/l.png\n",
+    );
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.rows[0]?.logoUrl).toBe("/logos/brondel.svg");
+    expect(result.rows[1]?.logoUrl).toBe("https://example.com/l.png");
+  });
+
+  it("rejects a protocol-relative logo, which is remote wearing a local path", () => {
+    for (const bad of [
+      "//evil.example/logo.png",
+      "javascript:alert(1)",
+      "logo.png",
+    ]) {
+      expect(parseListingsCsv(`name,logo_url\nX,${bad}\n`).ok, bad).toBe(false);
+    }
+  });
 });

@@ -68,6 +68,16 @@ model Category {
   slug        String  @unique
   description String?
 
+  /// Which axis of the taxonomy this category belongs to — see
+  /// `categoryAxisSchema`. A column rather than an attribute because the
+  /// category list is grouped and filtered by it.
+  ///
+  /// Boomverzorging is not classified along one dimension. "Boom snoeien"
+  /// is a job, "ETW" is a certificate and "Particulieren" is a client type;
+  /// flattening them into one list produces a filter that reads as one
+  /// choice out of thirty when it is really seven independent choices.
+  axis String @default("dienst")
+
   seoTitle       String?
   seoDescription String?
 
@@ -82,6 +92,7 @@ model Category {
   listings ListingCategory[]
 
   @@index([published])
+  @@index([axis])
 }
 
 /// A light label. Deliberately has no route of its own: tags feed search

@@ -19,6 +19,39 @@ export const submissionKindSchema = z.enum(SUBMISSION_KINDS);
 export type SubmissionKind = z.infer<typeof submissionKindSchema>;
 
 /**
+ * The axes a category can belong to.
+ *
+ * Locatie is deliberately not one of them. A municipality is a place, not a
+ * category: it lives on the listing's `city` and in `attributes.werkgebied`.
+ * Modelling "Brasschaat" as a category beside "Boom snoeien" is what
+ * produces the filter-combination pages that make a local directory read as
+ * spam — `/etw/boom-snoeien/particulier/brasschaat` and its two hundred
+ * siblings.
+ */
+export const CATEGORY_AXES = [
+  "dienst",
+  "specialisatie",
+  "certificering",
+  "materieel",
+  "klant",
+  "beschikbaarheid",
+  "providertype",
+] as const;
+export const categoryAxisSchema = z.enum(CATEGORY_AXES);
+export type CategoryAxis = z.infer<typeof categoryAxisSchema>;
+
+/** Section headings, in the order the axes are shown. */
+export const CATEGORY_AXIS_LABELS: Record<CategoryAxis, string> = {
+  dienst: "Diensten",
+  specialisatie: "Specialisaties",
+  certificering: "Certificering",
+  materieel: "Materieel",
+  klant: "Klanttype",
+  beschikbaarheid: "Beschikbaarheid",
+  providertype: "Type aanbieder",
+};
+
+/**
  * A URL we are willing to put in an `href`.
  *
  * The protocol check is the point: `javascript:` and `data:` parse as valid
@@ -51,6 +84,31 @@ const optionalText = (max: number) =>
 
 const optionalUrl = z
   .union([z.literal(""), httpUrlSchema])
+  .transform((value) => (value === "" ? undefined : value))
+  .optional();
+
+/**
+ * An image this site may render: an http(s) URL, or a path into `/public`.
+ *
+ * The local form exists because a directory that has no vendor logos yet
+ * still wants a visual on every card, and the honest way to do that is to
+ * ship our own placeholder rather than hotlink an image from the company's
+ * site — which is someone else's bandwidth, someone else's copyright, and
+ * broken the day they redesign.
+ *
+ * `//host/path` is rejected along with everything else that is not a single
+ * leading slash: a protocol-relative URL is a remote image wearing a local
+ * path's clothes.
+ */
+const optionalImagePath = z
+  .union([
+    z.literal(""),
+    httpUrlSchema,
+    z
+      .string()
+      .trim()
+      .regex(/^\/[^/\s][^\s]*$/, "must be an http(s) URL or a /public path"),
+  ])
   .transform((value) => (value === "" ? undefined : value))
   .optional();
 
@@ -92,7 +150,7 @@ export const listingInputSchema = z
     shortDescription: optionalText(300),
     description: optionalText(20_000),
     websiteUrl: optionalUrl,
-    logoUrl: optionalUrl,
+    logoUrl: optionalImagePath,
 
     country: optionalText(80),
     city: optionalText(80),
@@ -143,6 +201,7 @@ export const categoryInputSchema = z
         message: "slug must be lowercase, hyphen-separated, no accents",
       }),
     description: optionalText(600),
+    axis: categoryAxisSchema.default("dienst"),
     seoTitle: optionalText(160),
     seoDescription: optionalText(320),
     published: z.boolean().default(true),

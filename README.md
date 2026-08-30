@@ -14,21 +14,55 @@ Gekloond van [`pieterH2547/IDFIXD`](https://github.com/pieterH2547/IDFIXD)
   per opdracht geoffreerd).
 - `src/config/branding.ts` en de tokens in `src/app/globals.css` — groen
   accent, één palet, in beide bestanden gelijkgehouden.
-- `package.json` — naam en beschrijving.
+- **De taxonomie**: zeven assen in `data/categories.csv`, gedragen door een
+  `axis`-kolom op `Category`. Diensten, specialisaties, certificering,
+  materieel, klanttype, beschikbaarheid en type aanbieder. `/categories`
+  toont ze gegroepeerd.
+- **50 bedrijven** in `data/listings.csv`, met een gegenereerd beeldmerk per
+  bedrijf in `public/logos/` (`npm run logos`).
+
+### Locatie is geen categorie
+
+De achtste as die zich opdringt — gemeente — is er bewust niet. Een gemeente
+is een plaats, en die staat in `city` en `attributes.werkgebied`. Zodra
+`/boomverzorgers/[gemeente]` bestaat wordt het een echte tabel: SQLite kan
+niet indexeren binnen een JSON-string, dus een pagina die op werkgebied
+selecteert kan daar niet op selecteren.
+
+Wat we er níet van maken is de kruising van alles met alles.
+`/etw/boom-snoeien/particulier/brasschaat` en zijn tweehonderd broertjes zijn
+dunne pagina's die elkaar beconcurreren. `indexing.minListingsPerCategory`
+staat op 3: een categoriepagina met minder dan drie bedrijven is automatisch
+`noindex` en staat niet in de sitemap.
+
+### Wat de data wel en niet beweert
+
+Dit zijn echte bedrijven, en de gids zegt per pagina wat ervan gecontroleerd
+is. Van de shortlist staan alleen **naam en standplaats** vast. Diensten,
+certificaten, materieel en klanttypes zijn leeg gelaten — die invullen zou
+neerkomen op verzonnen feiten over andermans onderneming. Twaalf bedrijven
+hebben een website die op 2026-08-30 via zoekresultaten aan de naam te
+koppelen was; dat staat er ook zo bij, niet als bevestiging door het bedrijf
+zelf.
+
+Elk bedrijf draagt `attributes.verificatie`, en de bedrijfspagina rendert dat
+als een blok "Wat is gecontroleerd". `verified` staat op `no` voor alle
+vijftig.
+
+De beeldmerken in `public/logos/` zijn **geen logo's van die bedrijven**: het
+zijn gegenereerde initialen op een kleur die uit de slug volgt. Geen
+gehotlinkte beelden van hun eigen sites — dat is hun bandbreedte, hun
+auteursrecht, en stuk zodra ze hun site vernieuwen. Een echt logo komt erin
+door `logo_url` van die rij aan te passen, met toestemming.
 
 ### Wat nog open staat
 
-- `data/categories.csv` — nog de generieke demo-taxonomie
-  (advisory/technology/operations); moet snoeien, vellen, stobbenfrezen,
-  boomveiligheidscontrole enzovoort worden.
-- `data/listings.csv` — nog de tien fictieve demobedrijven.
-- `src/config/attributes.ts` — nog de generieke velden; certificaten
-  (ETW/European Tree Worker), werkgebied en materieel horen hier.
+- De koppeling bedrijf → dienst, certificaat en klanttype. De assen bestaan,
+  de toewijzing is vendorwerk of onderzoek.
+- `/boomverzorgers/[gemeente]` en `/[dienst]/[gemeente]` bestaan nog niet.
 - De component-teksten (`src/components`, `src/app`) zijn nog Engels.
 - `legal.terms` en `legal.privacy` staan op `null`, dus die pagina's blijven
   `noindex` tot er een door een jurist geschreven tekst in staat.
-- Logo en favicon: `branding.logoSrc` is `null` (tekstwoordmerk),
-  `faviconEmoji` staat op 🌳.
 
 ### Tijdelijk online zetten (demo)
 
@@ -45,8 +79,9 @@ gehonoreerd.
 
 Twee dingen die deze opzet bewust doet, en waarom ze weg moeten vóór lancering:
 
-- `X-Robots-Tag: noindex` op elke response. Deze demo toont voorbeelddata; die
-  hoort niet in Google.
+- `X-Robots-Tag: noindex` op elke response. De gids bevat pagina's over echte
+  bedrijven waarvan alleen naam en standplaats geverifieerd zijn; die horen
+  niet in Google tot de rest klopt.
 - De data is read-only en bevriest op het moment van de build. Formulieren
   schrijven naar een bestand in een serverless functie en dat overleeft de
   request niet.
@@ -101,6 +136,7 @@ Open http://localhost:3000.
 | `npm test` | Vitest |
 | `npm run verify` | Every gate above, in order. `-- --quick` skips the build |
 | `npm run import` | Validate and import `data/` |
+| `npm run logos` | Draw a placeholder mark for every listing without a logo |
 | `npm run seed` | Reset local data, then import `data/` |
 | `npm run db:push` | Apply `schema.prisma` to the database |
 | `npm run db:studio` | Prisma Studio — this is the admin UI |
@@ -123,9 +159,11 @@ class of bug that only appears against the production driver.
 ## Seed data
 
 `npm run seed` clears the local database and runs the real importer against
-`data/`. The shipped demo is ten fictional businesses across three
-categories — one featured, one verified, one draft, several with sources and
-structured attributes.
+`data/`. What it loads here is the actual shortlist: fifty tree care
+companies in and around Antwerp, across the seven axes in
+`data/categories.csv`. None is marked `verified`, and each carries a
+`verificatie` note saying how far it was checked — see "Wat de data wel en
+niet beweert" above.
 
 It is not a hardcoded fixture on purpose: it goes through the same
 validation a real import does, so a broken importer fails the seed rather

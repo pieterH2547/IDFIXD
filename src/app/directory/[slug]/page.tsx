@@ -78,9 +78,13 @@ export default async function ListingPage({ params }: { params: Params }) {
 
   const location = [listing.city, listing.country].filter(Boolean).join(", ");
   const details = attributes.details ?? {};
+  const werkgebied = attributes.werkgebied ?? [];
   const showDetails =
     hasAttributes(attributes) &&
-    (Object.keys(details).length > 0 || attributes.founded || attributes.teamSize);
+    (Object.keys(details).length > 0 ||
+      attributes.founded ||
+      attributes.teamSize ||
+      werkgebied.length > 0);
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10">
@@ -169,10 +173,27 @@ export default async function ListingPage({ params }: { params: Params }) {
             {attributes.teamSize ? (
               <Row label="Team size" value={attributes.teamSize} />
             ) : null}
+            {werkgebied.length > 0 ? (
+              <Row label="Werkgebied" value={werkgebied.join(", ")} />
+            ) : null}
             {Object.entries(details).map(([label, value]) => (
               <Row key={label} label={label} value={value} />
             ))}
           </dl>
+        </section>
+      ) : null}
+
+      {attributes.verificatie ? (
+        // Said plainly rather than tucked into a footer. The alternative is
+        // a page about a real company that looks researched because it looks
+        // like every other page here — and the reader has no way to tell the
+        // difference. A directory that publishes what it has not checked
+        // owes the reader that sentence.
+        <section className="mt-8 rounded-md border border-[var(--color-line)] bg-[var(--color-surface)] p-4">
+          <h2 className="text-sm font-semibold">Wat is gecontroleerd</h2>
+          <p className="mt-1.5 text-sm text-[var(--color-ink-muted)]">
+            {attributes.verificatie}
+          </p>
         </section>
       ) : null}
 
